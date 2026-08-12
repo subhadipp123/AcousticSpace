@@ -52,3 +52,80 @@ def preprocess_audio(file_path: str) -> dict:
         "rir_features": extract_rir_features(audio, sr),
         "duration_seconds": len(audio) / sr,
     }
+    
+from pathlib import Path
+
+import librosa
+import librosa.display
+import matplotlib.pyplot as plt
+import numpy as np
+
+def generate_spectrogram(
+    audio_path: str,
+    output_dir: str = "data/generated",
+) -> str:
+    """
+    Generate a mel-spectrogram image for an audio file.
+    Returns the relative path to the generated image.
+    """
+
+    output_path = Path(output_dir)
+    output_path.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    audio_file = Path(audio_path)
+
+    y, sr = librosa.load(
+        str(audio_file),
+        sr=16000,
+        mono=True,
+    )
+
+    mel = librosa.feature.melspectrogram(
+        y=y,
+        sr=sr,
+        n_mels=128,
+        n_fft=1024,
+        hop_length=256,
+    )
+
+    mel_db = librosa.power_to_db(
+        mel,
+        ref=np.max,
+    )
+
+    image_name = (
+        f"{audio_file.stem}_mel_spectrogram.png"
+    )
+
+    image_path = output_path / image_name
+
+    plt.figure(
+        figsize=(10, 4),
+    )
+
+    librosa.display.specshow(
+        mel_db,
+        sr=sr,
+        hop_length=256,
+        x_axis="time",
+        y_axis="mel",
+    )
+
+    plt.colorbar(
+        format="%+2.0f dB",
+    )
+
+    plt.title("AcousticSpace Mel Spectrogram")
+    plt.tight_layout()
+
+    plt.savefig(
+        image_path,
+        dpi=150,
+    )
+
+    plt.close()
+
+    return str(image_path)
