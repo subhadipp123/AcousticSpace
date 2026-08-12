@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+env/
+.venv/
+
+# Environment variables
+.env
+
+# Data & models - large/binary files, don't commit these
+backend/data/raw/
+backend/data/processed/
+backend/data/uploads/
+backend/models/
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+
+# OS junk files
+.DS_Store
+Thumbs.db
