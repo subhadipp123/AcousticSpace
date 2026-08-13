@@ -5,6 +5,7 @@ export interface RIRFeatures {
   rms_energy_std: number;
 }
 
+
 export interface ModelPrediction {
   label: "bonafide" | "spoof";
   class_id: number;
@@ -13,6 +14,7 @@ export interface ModelPrediction {
   spoof_probability: number;
   model: "CNN" | "AST";
 }
+
 
 export interface AudioSegment {
   start_seconds: number;
@@ -23,6 +25,17 @@ export interface AudioSegment {
   spoof_probability: number;
   suspicious: boolean;
 }
+
+
+export interface AnalysisHistoryItem {
+  id: string;
+  filename: string;
+  timestamp: string;
+  prediction: "bonafide" | "spoof";
+  confidence: number;
+  model: "CNN" | "AST";
+}
+
 
 export interface AudioAnalysisResult {
   filename: string;
@@ -39,13 +52,6 @@ export interface AudioAnalysisResult {
   segments: AudioSegment[];
 
   spectrogram_path: string;
-}
 
-export interface AnalysisHistoryItem {
-  id: string;
-  filename: string;
-  timestamp: string;
-  prediction: "bonafide" | "spoof";
-  confidence: number;
-  model: "CNN" | "AST";
+  history_item: AnalysisHistoryItem;
 }

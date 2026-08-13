@@ -19,8 +19,13 @@ from app.ml.segment_analysis import (
     analyze_segments,
 )
 
+from app.services.history import (
+    save_analysis,
+)
+
 
 router = APIRouter()
+
 
 UPLOAD_DIR = "data/uploads"
 GENERATED_DIR = "data/generated"
@@ -54,8 +59,10 @@ async def upload_audio(
         raise HTTPException(
             status_code=400,
             detail=(
-                f"Unsupported file type '{ext}'. "
-                f"Allowed: {ALLOWED_EXTENSIONS}"
+                f"Unsupported file type "
+                f"'{ext}'. "
+                f"Allowed: "
+                f"{ALLOWED_EXTENSIONS}"
             ),
         )
 
@@ -109,6 +116,11 @@ async def upload_audio(
             save_path
         )
 
+        history_item = save_analysis(
+            safe_filename,
+            model_results["primary"],
+        )
+
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -141,13 +153,17 @@ async def upload_audio(
             model_results["ast"],
 
         "primary_prediction":
-            model_results[
-                "primary"
-            ],
+            model_results["primary"],
 
-        "segments": segments,
+        "segments":
+            segments,
 
         "spectrogram_path":
-            f"/generated/"
-            f"{spectrogram_filename}",
+            (
+                f"/generated/"
+                f"{spectrogram_filename}"
+            ),
+
+        "history_item":
+            history_item,
     }

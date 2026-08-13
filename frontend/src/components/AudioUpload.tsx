@@ -1,12 +1,22 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import type {
   AudioAnalysisResult,
   AnalysisHistoryItem,
 } from "../types/audio";
 
-import { uploadAudio } from "../services/api";
+import {
+  fetchHistory,
+  uploadAudio,
+} from "../services/api";
+
+import { API_BASE_URL } from "../services/api";
+
 import { Waveform } from "./Waveform";
+
 
 export function AudioUpload() {
   const [file, setFile] =
@@ -23,9 +33,22 @@ export function AudioUpload() {
   const [loading, setLoading] =
     useState(false);
 
-  const [history, setHistory] = useState<
-    AnalysisHistoryItem[]
-  >([]);
+  const [history, setHistory] =
+    useState<AnalysisHistoryItem[]>(
+      [],
+    );
+
+
+  useEffect(() => {
+    fetchHistory()
+      .then((items) => {
+        setHistory(items);
+      })
+      .catch(() => {
+        // Keep dashboard usable.
+      });
+  }, []);
+
 
   function handleFileChange(
     e: React.ChangeEvent<HTMLInputElement>,
@@ -38,6 +61,7 @@ export function AudioUpload() {
     setError(null);
   }
 
+
   async function handleUpload() {
     if (!file) {
       return;
@@ -48,25 +72,16 @@ export function AudioUpload() {
     setResult(null);
 
     try {
-      const data = await uploadAudio(file);
+      const data =
+        await uploadAudio(file);
 
       setResult(data);
 
-      setHistory((previous) => [
-        {
-          id: `${Date.now()}-${file.name}`,
-          filename: data.filename,
-          timestamp:
-            new Date().toLocaleString(),
-          prediction:
-            data.primary_prediction.label,
-          confidence:
-            data.primary_prediction.confidence,
-          model:
-            data.primary_prediction.model,
-        },
-        ...previous,
-      ]);
+      const updatedHistory =
+        await fetchHistory();
+
+      setHistory(updatedHistory);
+
     } catch (err) {
       setError(
         err instanceof Error
@@ -77,6 +92,7 @@ export function AudioUpload() {
       setLoading(false);
     }
   }
+
 
   return (
     <div
@@ -131,7 +147,9 @@ export function AudioUpload() {
             marginTop: "1.5rem",
           }}
         >
-          <h3>Analysis Result</h3>
+          <h3>
+            Analysis Result
+          </h3>
 
           <p>
             <strong>File:</strong>{" "}
@@ -140,81 +158,110 @@ export function AudioUpload() {
 
           <p>
             <strong>Duration:</strong>{" "}
-            {result.duration_seconds.toFixed(2)}s
+            {result.duration_seconds.toFixed(
+              2,
+            )}
+            s
           </p>
 
           <hr />
 
           <Waveform
-            audioUrl={`http://127.0.0.1:8000${result.audio_url}`}
+            audioUrl={`${API_BASE_URL}${result.audio_url}`}
             segments={result.segments}
           />
 
           <hr />
 
-          <h4>Primary Prediction — AST</h4>
+          <h4>
+            Primary Prediction — AST
+          </h4>
 
           <p>
-            <strong>Prediction:</strong>{" "}
+            <strong>
+              Prediction:
+            </strong>{" "}
             {result.primary_prediction.label.toUpperCase()}
           </p>
 
           <p>
-            <strong>Confidence:</strong>{" "}
+            <strong>
+              Confidence:
+            </strong>{" "}
             {(
-              result.primary_prediction.confidence *
+              result.primary_prediction
+                .confidence * 100
+            ).toFixed(2)}
+            %
+          </p>
+
+          <p>
+            <strong>
+              Bonafide probability:
+            </strong>{" "}
+            {(
+              result.primary_prediction
+                .bonafide_probability *
               100
             ).toFixed(2)}
             %
           </p>
 
           <p>
-            <strong>Bonafide probability:</strong>{" "}
+            <strong>
+              Spoof probability:
+            </strong>{" "}
             {(
               result.primary_prediction
-                .bonafide_probability * 100
-            ).toFixed(2)}
-            %
-          </p>
-
-          <p>
-            <strong>Spoof probability:</strong>{" "}
-            {(
-              result.primary_prediction
-                .spoof_probability * 100
+                .spoof_probability *
+              100
             ).toFixed(2)}
             %
           </p>
 
           <hr />
 
-          <h4>Model Comparison</h4>
+          <h4>
+            Model Comparison
+          </h4>
 
           <div
             style={{
               padding: "1rem",
-              border: "1px solid #ddd",
-              borderRadius: "8px",
-              marginBottom: "1rem",
+              border:
+                "1px solid #ddd",
+              borderRadius:
+                "8px",
+              marginBottom:
+                "1rem",
             }}
           >
-            <h5>CNN Baseline</h5>
+            <h5>
+              CNN Baseline
+            </h5>
 
             <p>
-              <strong>Prediction:</strong>{" "}
+              <strong>
+                Prediction:
+              </strong>{" "}
               {result.cnn.label.toUpperCase()}
             </p>
 
             <p>
-              <strong>Confidence:</strong>{" "}
+              <strong>
+                Confidence:
+              </strong>{" "}
               {(
-                result.cnn.confidence * 100
+                result.cnn.confidence *
+                100
               ).toFixed(2)}
               %
             </p>
 
             <p>
-              <strong>Spoof probability:</strong>{" "}
+              <strong>
+                Spoof probability:
+              </strong>{" "}
               {(
                 result.cnn.spoof_probability *
                 100
@@ -226,27 +273,38 @@ export function AudioUpload() {
           <div
             style={{
               padding: "1rem",
-              border: "1px solid #ddd",
-              borderRadius: "8px",
+              border:
+                "1px solid #ddd",
+              borderRadius:
+                "8px",
             }}
           >
-            <h5>AST Model</h5>
+            <h5>
+              AST Model
+            </h5>
 
             <p>
-              <strong>Prediction:</strong>{" "}
+              <strong>
+                Prediction:
+              </strong>{" "}
               {result.ast.label.toUpperCase()}
             </p>
 
             <p>
-              <strong>Confidence:</strong>{" "}
+              <strong>
+                Confidence:
+              </strong>{" "}
               {(
-                result.ast.confidence * 100
+                result.ast.confidence *
+                100
               ).toFixed(2)}
               %
             </p>
 
             <p>
-              <strong>Spoof probability:</strong>{" "}
+              <strong>
+                Spoof probability:
+              </strong>{" "}
               {(
                 result.ast.spoof_probability *
                 100
@@ -257,7 +315,9 @@ export function AudioUpload() {
 
           <hr />
 
-          <h4>Acoustic Features</h4>
+          <h4>
+            Acoustic Features
+          </h4>
 
           <p>
             <strong>
@@ -287,7 +347,9 @@ export function AudioUpload() {
           </p>
 
           <p>
-            <strong>RMS energy std:</strong>{" "}
+            <strong>
+              RMS energy std:
+            </strong>{" "}
             {result.rir_features
               .rms_energy_std
               .toFixed(4)}
@@ -295,9 +357,12 @@ export function AudioUpload() {
 
           <hr />
 
-          <h4>Segment Analysis</h4>
+          <h4>
+            Segment Analysis
+          </h4>
 
-          {result.segments.length === 0 ? (
+          {result.segments.length ===
+          0 ? (
             <p>
               No segment results available.
             </p>
@@ -308,10 +373,14 @@ export function AudioUpload() {
                   <div
                     key={index}
                     style={{
-                      marginBottom: "0.75rem",
-                      padding: "0.75rem",
-                      border: "1px solid #ccc",
-                      borderRadius: "8px",
+                      marginBottom:
+                        "0.75rem",
+                      padding:
+                        "0.75rem",
+                      border:
+                        "1px solid #ccc",
+                      borderRadius:
+                        "8px",
                     }}
                   >
                     <strong>
@@ -355,7 +424,9 @@ export function AudioUpload() {
                     </p>
 
                     <p>
-                      <strong>Status:</strong>{" "}
+                      <strong>
+                        Status:
+                      </strong>{" "}
                       {segment.suspicious
                         ? "SUSPICIOUS"
                         : "NORMAL"}
@@ -368,64 +439,83 @@ export function AudioUpload() {
 
           <hr />
 
-          <h4>Mel Spectrogram</h4>
+          <h4>
+            Mel Spectrogram
+          </h4>
 
           <img
-            src={`http://127.0.0.1:8000${result.spectrogram_path}`}
+            src={`${API_BASE_URL}${result.spectrogram_path}`}
             alt="Mel spectrogram"
             style={{
               width: "100%",
-              maxWidth: "650px",
-              display: "block",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
+              maxWidth:
+                "650px",
+              display:
+                "block",
+              borderRadius:
+                "8px",
+              border:
+                "1px solid #ccc",
             }}
           />
 
           <hr />
 
-          <h4>Analysis History</h4>
+          <h4>
+            Analysis History
+          </h4>
 
           {history.length === 0 ? (
-            <p>No previous analyses.</p>
+            <p>
+              No previous analyses.
+            </p>
           ) : (
             <div>
-              {history.map((item) => (
-                <div
-                  key={item.id}
-                  style={{
-                    padding: "0.75rem",
-                    marginBottom: "0.75rem",
-                    border: "1px solid #ddd",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <strong>
-                    {item.filename}
-                  </strong>
+              {history.map(
+                (item) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      padding:
+                        "0.75rem",
+                      marginBottom:
+                        "0.75rem",
+                      border:
+                        "1px solid #ddd",
+                      borderRadius:
+                        "8px",
+                    }}
+                  >
+                    <strong>
+                      {item.filename}
+                    </strong>
 
-                  <p>
-                    Time: {item.timestamp}
-                  </p>
+                    <p>
+                      Time:{" "}
+                      {item.timestamp}
+                    </p>
 
-                  <p>
-                    Model: {item.model}
-                  </p>
+                    <p>
+                      Model:{" "}
+                      {item.model}
+                    </p>
 
-                  <p>
-                    Prediction:{" "}
-                    {item.prediction.toUpperCase()}
-                  </p>
+                    <p>
+                      Prediction:{" "}
+                      {item.prediction.toUpperCase()}
+                    </p>
 
-                  <p>
-                    Confidence:{" "}
-                    {(
-                      item.confidence * 100
-                    ).toFixed(2)}
-                    %
-                  </p>
-                </div>
-              ))}
+                    <p>
+                      Confidence:{" "}
+                      {(
+                        item.confidence *
+                        100
+                      ).toFixed(2)}
+                      %
+                    </p>
+                  </div>
+                ),
+              )}
             </div>
           )}
         </div>

@@ -3,10 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.api.routes import upload
+from app.services.history import load_history
 
 
 app = FastAPI(
-    title="AcousticSpace API"
+    title="AcousticSpace API",
 )
 
 
@@ -55,4 +56,11 @@ def root():
 def health():
     return {
         "status": "ok"
+    }
+
+
+@app.get("/history")
+def history():
+    return {
+        "items": load_history()
     }
