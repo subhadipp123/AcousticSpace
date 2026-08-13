@@ -12,6 +12,8 @@ env/
 backend/data/raw/
 backend/data/processed/
 backend/data/uploads/
+backend/data/generated/
+backend/data/history/
 backend/models/
 
 # Node / frontend
