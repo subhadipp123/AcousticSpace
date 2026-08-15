@@ -1,0 +1,23 @@
+AcousticSpace - Final Common Development-Set Comparison
+
+Dataset:
+ASVspoof 2019 Logical Access
+
+Evaluation samples:
+100 common development-set samples
+
+CNN Baseline
+Accuracy : 65.00%
+Precision: 61.90%
+Recall   : 78.00%
+F1 Score : 69.03%
+
+AST-based Model
+Accuracy : 85.00%
+Precision: 90.70%
+Recall   : 78.00%
+F1 Score : 83.87%
+
+Conclusion:
+The AST-based approach outperformed the CNN baseline
+on the common 100-sample development-set evaluation.

@@ -1,0 +1,34 @@
+AcousticSpace — Model Evaluation Summary
+
+Baseline CNN
+------------
+Previous held-out test:
+Accuracy : 77.33%
+Precision: 77.70%
+Recall   : 76.67%
+F1 Score : 77.18%
+
+AST-based Model
+---------------
+Previous held-out test:
+Accuracy : 90.00%
+Precision: 92.86%
+Recall   : 86.67%
+F1 Score : 89.66%
+
+Fair Common Development-Set Comparison
+---------------------------------------
+See:
+common_model_comparison.txt
+
+Dataset
+-------
+ASVspoof 2019 Logical Access (LA)
+
+Primary application model
+-------------------------
+AST-based model
+
+Baseline model
+--------------
+CNN

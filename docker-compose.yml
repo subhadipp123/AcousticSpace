@@ -3,17 +3,23 @@ services:
   backend:
     build:
       context: ./backend
+
     ports:
       - "8000:8000"
+
     volumes:
+      - ./backend/models:/app/models
       - ./backend/data/uploads:/app/data/uploads
       - ./backend/data/generated:/app/data/generated
       - ./backend/data/history:/app/data/history
 
+
   frontend:
     build:
       context: ./frontend
+
     ports:
       - "5173:80"
+
     depends_on:
       - backend
