@@ -11,10 +11,13 @@ app = FastAPI(
 )
 
 
+# Allow both localhost and 127.0.0.1 frontend URLs.
+# The browser may treat these as different origins.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
+        "http://127.0.0.1:5173",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -22,6 +25,7 @@ app.add_middleware(
 )
 
 
+# Serve generated spectrograms and other generated files.
 app.mount(
     "/generated",
     StaticFiles(
@@ -31,6 +35,7 @@ app.mount(
 )
 
 
+# Serve uploaded audio files.
 app.mount(
     "/uploads",
     StaticFiles(
@@ -40,6 +45,7 @@ app.mount(
 )
 
 
+# Upload and analysis API routes.
 app.include_router(
     upload.router
 )
