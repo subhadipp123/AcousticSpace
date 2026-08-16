@@ -1,4 +1,4 @@
-# AcousticSpace — Deepfake Audio Detection with Acoustic Analysis and AST
+# AcousticSpace — Deepfake Audio Detection via Room Impulse Response (RIR)
 
 AcousticSpace is an end-to-end deepfake audio detection system that combines **acoustic/spectral analysis**, a lightweight **CNN baseline**, and a pretrained **Audio Spectrogram Transformer (AST)** representation model.
 
