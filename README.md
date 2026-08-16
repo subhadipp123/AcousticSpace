@@ -76,7 +76,7 @@ The system accepts an audio recording, analyzes its acoustic characteristics, ge
                   Persistent History
 
 
-Project Objective
+## Project Objective
 
 The goal of AcousticSpace is to classify uploaded speech as:
 
