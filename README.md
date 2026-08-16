@@ -87,7 +87,9 @@ The project explores whether acoustic and spectral characteristics of an audio r
 
 Important: The current implementation extracts acoustic and spectral characteristics related to recording conditions. It does not directly estimate a physical Room Impulse Response (RIR).
 
-Dataset
+---
+
+## Dataset
 
 AcousticSpace uses the ASVspoof 2019 Logical Access (LA) dataset.
 
